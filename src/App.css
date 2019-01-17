@@ -1,0 +1,122 @@
+.Autonomous-GC-controller {
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body {
+   height: 100vh;
+   overflow: hidden;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  height: 10vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.content {
+   display: flex;
+   flex-flow: column nowrap;
+   align-items: center;
+   justify-content: flex-end;
+   height: 100%;
+}
+
+.flex-row {
+   display: flex;
+   flex-flow: row nowrap;
+}
+
+#view-row {
+   flex-grow: 1;
+   -webkit-flex-grow: 1;
+   width: 100vw;
+}
+
+#control-row {
+   align-items: flex-end;
+   justify-content: space-around;
+   height: 55%;
+   width: 100vw;
+   perspective: 1000px;
+   perspective-origin: bottom;
+   -webkit-perspective: 1000px;
+   -webkit-perspective-origin: bottom;
+}
+
+#control-row > * {
+   user-select: none;
+   cursor: pointer;
+}
+
+#steering-wheel-image {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+   width: auto;
+   height: auto;
+   border-radius: 50%;
+   object-fit: contain;
+}
+
+#gas-pedal {
+   color: lightGreen;
+}
+
+#brake-pedal {
+   color: red;
+}
+
+.pedal {
+   background-color: #4A4A4A;
+   height: 80%;
+   width: 10%;
+   display: flex;
+   flex-flow: column nowrap;
+   align-items: center;
+   justify-content: center;
+   font-weight: bold;
+   color: white;
+
+}
+
+.row-fill {
+   flex-grow: 1;
+   height: 100%;
+}
+
+.control-data-box {
+   display: inline-block;
+   margin-top: 15%;
+   padding: 0 10px;
+}
+
+.control-data-header {
+   padding: 5px 5px 0 5px;
+   margin: 0;
+   border-bottom: 1px solid black;
+}
+
+.control-data {
+   padding: 2px;
+   margin: 5px;
+   border-radius: 5px;
+   background-color: #4A4A4A;
+   color: white;
+}
