@@ -47,6 +47,9 @@ body {
    flex-grow: 1;
    -webkit-flex-grow: 1;
    width: 100vw;
+   justify-content: space-around;
+   align-items: center;
+   height: 45%;
 }
 
 #control-row {
@@ -119,4 +122,18 @@ body {
    border-radius: 5px;
    background-color: #4A4A4A;
    color: white;
+}
+
+.stream-container {
+   max-width: 45%;
+   flex-grow: 1;
+   height: 95%;
+}
+
+.stream-image {
+   object-fit: contain;
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+   margin: auto;
 }

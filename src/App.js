@@ -258,7 +258,8 @@ class App extends Component {
             </header>
             <div className="content">
                <div id="view-row" className="flex-row">
-
+                  <VideoStream />
+                  <MapStream />
                </div>
                <div id="control-row" className="flex-row">
                   <div className="row-fill"></div>
@@ -285,73 +286,24 @@ class App extends Component {
    }
 }
 
+class VideoStream extends Component {
+   render() {
+      return (
+         <div id="camera-stream-container" className="stream-container">
+            <img className="stream-image" src="http://placehold.jp/1000x1000.png?text=Cameria%20View"/>
+         </div>
+      );
+   }
+}
 
-
-// var R2D, active, angle, center, init, rotate, rotation, start, startAngle, stop;
-//
-//   active = false;
-//
-//   angle = 0;
-//
-//   rotation = 0;
-//
-//   startAngle = 0;
-//
-//   center = {
-//     x: 0,
-//     y: 0
-//   };
-//
-//   init = function() {
-//     target.addEventListener("mousedown", start, false);
-//     target.addEventListener("mousemove", rotate, false);
-//     return target.addEventListener("mouseup", stop, false);
-//   };
-//
-//   R2D = 180 / Math.PI;
-//
-//   start = function(e) {
-//     var height, left, top, width, x, y, _ref;
-//     e.preventDefault();
-//     _ref = this.getBoundingClientRect(), top = _ref.top, left = _ref.left, height = _ref.height, width = _ref.width;
-//     center = {
-//       x: left + (width / 2),
-//       y: top + (height / 2)
-//     };
-//     x = e.clientX - center.x;
-//     y = e.clientY - center.y;
-//     startAngle = R2D * Math.atan2(y, x);
-//     return active = true;
-//   };
-//
-//   rotate = function(e) {
-//     var d, x, y;
-//     e.preventDefault();
-//     x = e.clientX - center.x;
-//     y = e.clientY - center.y;
-//     d = R2D * Math.atan2(y, x);
-//     rotation = d - startAngle;
-//     if (active) {
-//       return this.style.webkitTransform = "rotate(" + (angle + rotation) + "deg)";
-//     }
-//   };
-//
-//   stop = function() {
-//     angle += rotation;
-//     return active = false;
-//   };
-
-// <img src={logo} className="App-logo" alt="logo" />
-// <p>
-//   Edit <code>src/App.js</code> and save to reload.
-// </p>
-// <a
-//   className="App-link"
-//   href="https://reactjs.org"
-//   target="_blank"
-//   rel="noopener noreferrer"
-// >
-//   Learn React
-// </a>
+class MapStream extends Component {
+   render() {
+      return (
+         <div id="map-stream-container" className="stream-container">
+            <img className="stream-image" src="http://placehold.jp/1000x1000.png?text=Map%20View"/>
+         </div>
+      );
+   }
+}
 
 export default App;
