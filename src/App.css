@@ -57,10 +57,10 @@ body {
    justify-content: space-around;
    height: 55%;
    width: 100vw;
-   perspective: 1000px;
-   perspective-origin: bottom;
-   -webkit-perspective: 1000px;
-   -webkit-perspective-origin: bottom;
+   perspective: 2000px;
+   perspective-origin: center;
+   -webkit-perspective: 2000px;
+   -webkit-perspective-origin: center;
 }
 
 #control-row > * {
@@ -86,8 +86,39 @@ body {
    color: red;
 }
 
+#gas-pedal::before {
+   left: -10px;
+}
+
+#brake-pedal::before {
+   right: -10px;
+}
+
+
+.pedal::before {
+   content: '';
+   position: absolute;
+   background-color: #7F7F7F;
+   height: 100%;
+   top: 0;
+   width: 20px;
+   transform: translateZ(-10px) rotateY(90deg);
+   -webkit-transform: translateZ(-10px) rotateY(90deg);
+}
+
+.pedal::after {
+   content: '';
+   position: absolute;
+   background-color: #606060;
+   height: 20px;
+   width: 100%;
+   bottom: -10px;
+   transform: translateZ(-10px) rotateX(90deg);
+   -webkit-transform: translateZ(-10px) rotateX(90deg);
+}
+
 .pedal {
-   background-color: #4A4A4A;
+   background-color: #505050;
    height: 80%;
    width: 10%;
    display: flex;
@@ -96,11 +127,24 @@ body {
    justify-content: center;
    font-weight: bold;
    color: white;
+   transform-style: preserve-3d;
+   transform-origin: 50% 70%;
+   transition: transfrom 0.5s ease-out;
+   -webkit-transition: -webkit-transform 0.5s ease-out;
 
+}
+
+.rotate-pedal {
+   transform: translateY(-5px) rotateX(30deg);
+   -webkit-transform: translateY(-5px) rotateX(30deg);
 }
 
 .row-fill {
    flex-grow: 1;
+   height: 100%;
+}
+
+.row-item {
    height: 100%;
 }
 
@@ -120,8 +164,34 @@ body {
    padding: 2px;
    margin: 5px;
    border-radius: 5px;
-   background-color: #4A4A4A;
+   background-color: #505050;
    color: white;
+}
+
+#speed-data {
+   font-size: 3ch;
+   padding: 0px 10px;
+}
+
+#wheel-angle-data {
+   font-size: 3ch;
+   padding: 0px 10px;
+}
+
+.direction-icon {
+   margin: 0;
+   padding: 0;
+   font-size: 5em;
+}
+
+#up-direction-icon {
+   transform: rotate(-90deg) translateY(-0.06em);
+   -webkit-transform: rotate(-90deg) translateY(-0.06em);
+}
+
+#down-direction-icon {
+   transform: rotate(90deg) translateY(-0.06em);
+   -webkit-transform: rotate(90deg) translateY(-0.06em);
 }
 
 .stream-container {

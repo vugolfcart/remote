@@ -1,6 +1,23 @@
 import React, { Component } from 'react';
 import steeringWheel from './assets/steering-wheel.png';
+import ROSLIB from 'roslib';
 import './App.css';
+
+// var ros = new ROSLIB.Ros({
+//     url : 'ws://localhost:9090'
+// });
+//
+// ros.on('connection', function() {
+// console.log('Connected to websocket server.');
+// });
+//
+// ros.on('error', function(error) {
+// console.log('Error connecting to websocket server: ', error);
+// });
+//
+// ros.on('close', function() {
+// console.log('Connection to websocket server closed.');
+// });
 
 class App extends Component {
    constructor(props) {
@@ -33,10 +50,13 @@ class App extends Component {
          speed: 10,
          wheelTurn: {
             startAngle: 0, // radians
-            currentAngle: 0, // radians
             active: false,
             rotation: 0, // radians
          },
+         currentAngle: 0, // radians
+         totalRotation: 0, // radians
+         powersteering: true, // wheel turns back to 0 when let go
+         autoTurning: false, // wheel is currently turning by itself
       };
    }
 
@@ -179,18 +199,17 @@ class App extends Component {
 
    rotatePedal(el) {
       // rotate element in z direction
-      el.style.transform = 'rotate3d(1, 0, 0, 20deg)';
-      el.style.webkitTransform = 'rotate3d(1, 0, 0, 20deg)';
+      el.className = el.className + ' rotate-pedal';
    }
 
    unrotatePedal(el) {
       // unrotate element in z direction
-      el.style.transform = '';
-      el.style.webkitTransform = '';
+      el.className = el.className.replace(/ rotate-pedal/, '');
    }
 
    rotateWheel(e) {
-      const { active, currentAngle, startAngle } = this.state.wheelTurn;
+      const { active, startAngle } = this.state.wheelTurn;
+      const { currentAngle, totalRotation } = this.state;
       e.preventDefault();
 
       if (active) {
@@ -207,7 +226,25 @@ class App extends Component {
          const rotation =  Math.atan2(y, x) - startAngle;
 
 
-         this.setState({wheelTurn: {active: active, currentAngle: currentAngle, startAngle: startAngle, rotation: rotation}})
+
+         // The below is to get the amount rotated since totalRotation
+         // it then adds to the totalRotation to get the new totalRotation
+         const positiveCurrentAngle = (currentAngle + rotation) < 0 ? 2 * Math.PI + (currentAngle + rotation) : (currentAngle + rotation);
+         const positiveTotalRotation = totalRotation - (2 * Math.PI * Math.floor(totalRotation / (2 * Math.PI)));
+
+         // between [-PI, PI]
+         const ca = positiveCurrentAngle > Math.PI ? -2 * Math.PI + positiveCurrentAngle : positiveCurrentAngle;
+         const tr = positiveTotalRotation >  Math.PI ? -2 * Math.PI + positiveTotalRotation : positiveTotalRotation;
+
+         // angle between these two (positive if clockwise & negative if counterclockwise)
+         let a = ca - tr;
+         a += a > Math.PI ? -2*Math.PI : (a < -Math.PI ? 2*Math.PI : 0);
+
+         const globalRotation = totalRotation + a;
+
+
+
+         this.setState({wheelTurn: {active: active, startAngle: startAngle, rotation: rotation}, currentAngle: currentAngle, totalRotation: globalRotation})
 
          this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
          this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
@@ -216,6 +253,8 @@ class App extends Component {
 
    startRotateWheel(e) {
       e.preventDefault();
+      this.setState({autoTurning: false});
+
       const _ref = this.wheelElement.current.getBoundingClientRect();
       const center = {
          x: _ref.left + (_ref.width / 2),
@@ -224,18 +263,47 @@ class App extends Component {
       const x = e.clientX - center.x;
       const y = e.clientY - center.y;
 
-      this.setState({wheelTurn: {startAngle: Math.atan2(y, x), active: true, currentAngle: this.state.wheelTurn.currentAngle, rotation: 0}});
+      this.setState({wheelTurn: {startAngle: Math.atan2(y, x), active: true, rotation: 0}});
 
    }
 
    endRotateWheel() {
-      const { active, currentAngle, startAngle, rotation } = this.state.wheelTurn;
+      const { active, startAngle, rotation } = this.state.wheelTurn;
+      const { currentAngle } = this.state;
 
       if (active) {
          let angle = currentAngle + rotation;
 
-         this.setState({wheelTurn: {startAngle: startAngle, currentAngle: angle, active: false, rotation: 0}});
+         this.setState({wheelTurn: {startAngle: startAngle,  active: false, rotation: 0}, currentAngle: angle});
+
+         if (this.state.powersteering) {
+            this.setState({autoTurning: true});
+            const interval = setInterval(() => {
+               let tr = this.state.totalRotation;
+               if (!this.state.autoTurning || Math.abs(tr) < 0.01) {
+                  clearInterval(interval);
+                  return;
+               }
+
+               if (tr < 0)
+                  tr += 0.01;
+               else
+                  tr -= 0.01;
+
+               this.setState({totalRotation: tr, currentAngle: tr});
+
+
+               this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
+               this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
+
+
+               //TODO: make this an animation?
+
+            }, 3);
+         }
       }
+
+
 
       // TODO: impliment power steering-like effects, i.e. wheel turns back after you have turned it
       // TODO: limit turn
@@ -264,19 +332,29 @@ class App extends Component {
                <div id="control-row" className="flex-row">
                   <div className="row-fill"></div>
                   <div id="brake-pedal" className="pedal" onMouseDown={this.brake} onMouseUp={this.stopBrake} ref={this.brakePedalElement}>BRAKE</div>
-                  <div className="row-fill">
+                  <div className="row-fill"></div>
+                  <div className="row-item">
                      <div className="control-data-box">
                         <h4 className="control-data-header">Speed</h4>
-                        <p className="control-data">{Math.abs(this.state.speed)}</p>
+                        <p className="control-data" id="speed-data">{Math.abs(this.state.speed)}</p>
+                        <br/>
+                        <br/>
+                        <h4 className="control-data-header">Wheel Angle</h4>
+                        <p className="control-data" id="wheel-angle-data">{Math.round(180 / Math.PI * this.state.totalRotation)}</p>
                      </div>
                   </div>
                   <img src={steeringWheel} id="steering-wheel-image" alt="steering wheel" draggable="false" onMouseDown={this.startRotateWheel} onMouseUp={this.endRotateWheel}  ref={this.wheelElement}/>
-                  <div className="row-fill">
+                  <div className="row-item">
                      <div className="control-data-box">
                         <h4 className="control-data-header">Direction</h4>
+                        <div className="control-data">
+                           <p className="direction-icon" id="up-direction-icon" style={{color: this.state.speed > 0 ? '#0F0' : '#606060'}}>&#10147;</p>
+                           <p className="direction-icon" id="down-direction-icon" style={{color: this.state.speed < 0 ? '#F00' : '#606060'}}>&#10146;</p>
+                        </div>
                         <p className="control-data">{this.state.speed > 0 ? 'Forward' : 'Reverse'}</p>
                      </div>
                   </div>
+                  <div className="row-fill"></div>
                   <div id="gas-pedal" className="pedal" onMouseDown={this.gas} onMouseUp={this.stopGas} ref={this.gasPedalElement}>GAS</div>
                   <div className="row-fill"></div>
                </div>
