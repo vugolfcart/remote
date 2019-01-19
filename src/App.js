@@ -296,9 +296,6 @@ class App extends Component {
                this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
                this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
 
-
-               //TODO: make this an animation?
-
             }, 3);
          }
       }
