@@ -296,7 +296,7 @@ class App extends Component {
                this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
                this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (tr ) + "deg)";
 
-            }, 3);
+            }, 10);
          }
       }
 
@@ -305,6 +305,9 @@ class App extends Component {
       // TODO: impliment power steering-like effects, i.e. wheel turns back after you have turned it
       // TODO: limit turn
    }
+
+   // TODO: add settings to change power steering
+   // TODO: double click for dragging steering wheel
 
    render() {
       return (
@@ -318,8 +321,25 @@ class App extends Component {
                this.endRotateWheel();
             }
          }}>
-            <header className = "App-header" >
-               <h1 className = "App-title" > VU Golf Cart Controller </h1>
+            <header className="App-header" >
+               <table className="header-table">
+                  <tbody>
+                     <tr>
+                        <td className="table-fill"></td>
+                        <td><h2 className="App-title">VU Golf Cart Controller</h2></td>
+                        <td className="table-fill">
+                           <div className='settings-button-container'>
+                              <a id='settings-button'><span>Settings</span></a>
+                           </div>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <div id="settings-dropdown">
+                  <a>Powersteering: ON</a>
+               </div>
+
+
             </header>
             <div className="content">
                <div id="view-row" className="flex-row">
