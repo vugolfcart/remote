@@ -3,25 +3,23 @@ import steeringWheel from './assets/steering-wheel.png';
 import ROSLIB from 'roslib';
 import './App.css';
 
-// var ros = new ROSLIB.Ros({
-//     url : 'ws://localhost:9090'
-// });
-//
-// ros.on('connection', function() {
-// console.log('Connected to websocket server.');
-// });
-//
-// ros.on('error', function(error) {
-// console.log('Error connecting to websocket server: ', error);
-// });
-//
-// ros.on('close', function() {
-// console.log('Connection to websocket server closed.');
-// });
-
 class App extends Component {
    constructor(props) {
       super(props);
+      this.ros = new ROSLIB.Ros({
+        url : 'ws://localhost:9090'
+      });
+      this.ros.on('connection', function() {
+        console.log('Connected to websocket server.');
+      });
+
+      this.ros.on('error', function(error) {
+        console.log('Error connecting to websocket server: ', error);
+      });
+
+      this.ros.on('close', function() {
+        console.log('Connection to websocket server closed.');
+      });
 
       this.gasPedalElement = React.createRef();
       this.brakePedalElement = React.createRef();
@@ -310,6 +308,20 @@ class App extends Component {
    // TODO: double click for dragging steering wheel
 
    render() {
+        const angle = Math.round(180 / Math.PI * this.state.totalRotation);
+        const velocity = Math.abs(this.state.speed);
+        const controlDriveParameters = new ROSLIB.Topic({
+            ros : this.ros,
+            name : '/control_drive_parameters',
+            messageType : 'control/drive_param'
+        });
+
+        const driveParameters = new ROSLIB.Message({
+            angle,
+            velocity,
+        });
+        controlDriveParameters.publish(driveParameters);
+    
       return (
          <div className="Autonomous-GC-controller" onMouseMove={(e) => {
             if (this.state.wheelTurn.active)
