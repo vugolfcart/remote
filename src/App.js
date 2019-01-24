@@ -3,21 +3,33 @@ import steeringWheel from './assets/steering-wheel.png';
 import ROSLIB from 'roslib';
 import './App.css';
 
-// var ros = new ROSLIB.Ros({
-//     url : 'ws://localhost:9090'
-// });
-//
-// ros.on('connection', function() {
-// console.log('Connected to websocket server.');
-// });
-//
-// ros.on('error', function(error) {
-// console.log('Error connecting to websocket server: ', error);
-// });
-//
-// ros.on('close', function() {
-// console.log('Connection to websocket server closed.');
-// });
+// comment this out to not display the error box;
+window.onload = () => (function(){
+   var oldLog = console.log;
+   var eb = document.getElementById('error-box');
+   console.log = function (message) {
+        // DO MESSAGE HERE.
+        eb.innerText = eb.innerText + '\n' + message;
+        oldLog.apply(console, arguments);
+   };
+})();
+
+var ros = new ROSLIB.Ros({
+    url : 'ws://localhost:9090'
+});
+
+ros.on('connection', function() {
+console.log('Connected to websocket server.');
+});
+
+ros.on('error', function(error) {
+console.log('Error connecting to websocket server: ', error);
+});
+
+ros.on('close', function() {
+console.log('Connection to websocket server closed.');
+});
+
 
 class App extends Component {
    constructor(props) {
@@ -321,6 +333,9 @@ class App extends Component {
                this.endRotateWheel();
             }
          }}>
+            <div id="error-box"></div>
+            <script>
+            </script>
             <header className="App-header" >
                <table className="header-table">
                   <tbody>
@@ -328,16 +343,19 @@ class App extends Component {
                         <td className="table-fill"></td>
                         <td><h2 className="App-title">VU Golf Cart Controller</h2></td>
                         <td className="table-fill">
-                           <div className='settings-button-container'>
-                              <a id='settings-button'><span>Settings</span></a>
+                           <div className='dropdown-container'>
+                              <div className='settings-button-container'>
+                                 <a id='settings-button'><span>Settings</span></a>
+                              </div>
+                              <div id="settings-dropdown">
+                                 <a>Powersteering: ON</a>
+                              </div>
                            </div>
                         </td>
                      </tr>
                   </tbody>
                </table>
-               <div id="settings-dropdown">
-                  <a>Powersteering: ON</a>
-               </div>
+
 
 
             </header>

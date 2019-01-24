@@ -1,3 +1,17 @@
+#error-box {
+   position: absolute;
+   top: 0;
+   left: 0;
+   font-size: 12px;
+   background-color: white;
+   border: solid 1px red;
+   min-width: 200px;
+   max-width: 400px;
+   min-height: 200px;
+   max-height: 50%;
+   text-align: left;
+}
+
 .Autonomous-GC-controller {
   text-align: center;
   height: 100vh;
@@ -50,6 +64,8 @@ body {
 
 .header-table .table-fill {
    width: 20%;
+   padding: 0;
+   vertical-align: top;
 }
 
 .settings-button-container {
@@ -74,6 +90,10 @@ body {
    color: #000;
 }
 
+.dropdown-container {
+   position: relative;
+}
+
 #settings-dropdown {
    display: none;
    position: absolute;
@@ -82,6 +102,7 @@ body {
    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
    z-index: 3;
    right: 0;
+   top: 10vh;
 }
 
 #settings-dropdown a {
@@ -90,6 +111,7 @@ body {
   text-decoration: none;
   display: block;
   color: white;
+  border: solid 1px white;
 }
 
 #settings-button:hover #settings-dropdown {
