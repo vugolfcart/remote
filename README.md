@@ -7,3 +7,8 @@ Remote control for golf cart created using React
 	- Speed with key bindings (either A/D or LEFT/RIGHT for decrease/increase resp.)
 	- Direction (forward or reverse based on positive or negative speed)
 	- Placeholder for camera stream and  map
+
+## To-Do
+- [ ] limit turning to actual angles
+- [ ] double click to drag steering wheel
+- [x] setting to automatically turn back wheel to center
