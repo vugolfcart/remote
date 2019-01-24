@@ -7,6 +7,7 @@ export default class VideoStream extends Component {
         <img
           className="stream-image"
           src="http://placehold.jp/1000x1000.png?text=Camera%20View"
+          alt="Camera View"
         />
       </div>
     );

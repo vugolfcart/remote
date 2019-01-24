@@ -5,6 +5,22 @@ import './App.css';
 import VideoStream from './VideoStream';
 import Map from './Map';
 
+
+//==================================================================================================
+// CONTROLS (as of 1/24/19)
+//==================================================================================================
+// upArrow / w: press gas which increases speed (this will likely be changed later)
+// downArrow / s: press break which decreases speed (likely to be changed later)
+// leftArrow / a: decrease speed
+// rightArrow / d: increase speed
+// e: change direction (forward / reverse)
+// q: set speed to 0
+// p: toggle power steering (whether the wheel rotates back to normal)
+// click & drag wheel: turns wheel
+// double click wheel: turns wheel but don't have to hold the mouse down to drag
+//==================================================================================================
+//==================================================================================================
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -18,12 +34,16 @@ class App extends Component {
       messageType: 'control/drive_param'
     });
 
+    this.maxSpeed = 100;
+    this.maxWheelAngle = 4 * Math.PI;// radians
+
     this.wheelElement = React.createRef();
 
     this.state = {
       brake: false,
       gas: false,
       speed: 0,
+      direction: 1, // 1 = forward, -1 = reverse
       wheelTurn: {
         startAngle: 0, // radians
         active: false,
@@ -65,11 +85,14 @@ class App extends Component {
         this.setState({ speed: this.state.speed + 1 });
         break;
       case 'e':
-        this.setState({ speed: -this.state.speed });
+        this.setState({ speed: -this.state.speed, direction: -this.state.direction });
         break;
       case 'q':
         this.setState({ speed: 0 });
         break;
+      case 'p':
+         this.setState({ powersteering: !this.state.powersteering });;
+         break;
       default:
         break;
     }
@@ -93,6 +116,17 @@ class App extends Component {
   gas = (e) => {
     if (e) e.preventDefault();
 
+    // TODO: remove this later -- but useful for driving the RC car
+    // Increases speed when gas is pressed
+    //==============================================================================================
+    if (Math.abs(this.state.speed) <= this.maxSpeed) {
+      let newSpeed = this.state.speed / Math.abs(this.state.speed) + this.state.speed;
+      if (this.state.speed === 0)
+         newSpeed = this.state.direction;
+      this.setState({ speed: newSpeed });
+    }
+    //==============================================================================================
+
     if (this.state.brake) { // turn off brake if gas is pressed while brake is pressed
       this.stopBrake();
       this.setState({ brake: false });
@@ -112,6 +146,14 @@ class App extends Component {
 
   brake = (e) => {
     if (e) e.preventDefault();
+
+    // TODO: remove this later -- but useful for driving the RC car
+    // Decreases speed when brake is pressed
+    //==============================================================================================
+    if (this.state.speed !== 0)
+      this.setState({ speed: (0 - this.state.speed) / Math.abs(this.state.speed) + this.state.speed });
+    //==============================================================================================
+
 
     if (this.state.gas) { // turn off gas if brake is pressed
       this.stopGas();
@@ -161,10 +203,12 @@ class App extends Component {
 
       const globalRotation = totalRotation + a;
 
-      this.setState({ wheelTurn: { active: active, startAngle: startAngle, rotation: rotation }, currentAngle: currentAngle, totalRotation: globalRotation })
+      if (Math.abs(globalRotation) <= this.maxWheelAngle) {
+         this.setState({ wheelTurn: { active: active, startAngle: startAngle, rotation: rotation }, currentAngle: currentAngle, totalRotation: globalRotation })
 
-      this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
-      this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
+         this.wheelElement.current.style.transform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
+         this.wheelElement.current.style.webkitTransform = "rotate(" + 180 / Math.PI * (currentAngle + rotation) + "deg)";
+      }
     }
   }
 
@@ -235,22 +279,7 @@ class App extends Component {
         }
       }}>
         <header className="App-header" >
-          <table className="header-table">
-            <tbody>
-              <tr>
-                <td className="table-fill"></td>
-                <td><h2 className="App-title">VU Golf Cart Controller</h2></td>
-                <td className="table-fill">
-                  <div className='settings-button-container'>
-                    <a id='settings-button'><span>Settings</span></a>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="settings-dropdown">
-            <a>Powersteering: ON</a>
-          </div>
+           <h2 className="App-title">VU Golf Cart Controller</h2>
         </header>
 
         <div className="content">
@@ -272,19 +301,22 @@ class App extends Component {
                 <br />
                 <h4 className="control-data-header">Wheel Angle</h4>
                 <p className="control-data" id="wheel-angle-data">{Math.round(180 / Math.PI * this.state.totalRotation)}</p>
+                <br />
+                <h4 className="control-data-header">Power Steering</h4>
+                <p className="control-data" id="powersteering-data">{this.state.powersteering ? 'ON' : 'OFF'}</p>
               </div>
             </div>
 
-            <img src={steeringWheel} id="steering-wheel-image" alt="steering wheel" draggable="false" onMouseDown={this.startRotateWheel} onMouseUp={this.endRotateWheel} ref={this.wheelElement} />
+            <img src={steeringWheel} id="steering-wheel-image" alt="steering wheel" draggable="false" onMouseDown={this.startRotateWheel} onMouseUp={this.endRotateWheel} onDoubleClick={this.startRotateWheel} ref={this.wheelElement} />
 
             <div className="row-item">
               <div className="control-data-box">
                 <h4 className="control-data-header">Direction</h4>
                 <div className="control-data">
-                  <p className="direction-icon" id="up-direction-icon" style={{ color: this.state.speed > 0 ? '#0F0' : '#606060' }}>&#10147;</p>
-                  <p className="direction-icon" id="down-direction-icon" style={{ color: this.state.speed < 0 ? '#F00' : '#606060' }}>&#10146;</p>
+                  <p className="direction-icon" id="up-direction-icon" style={{ color: this.state.direction > 0 ? '#0F0' : '#606060' }}>&#10147;</p>
+                  <p className="direction-icon" id="down-direction-icon" style={{ color: this.state.direction < 0 ? '#F00' : '#606060' }}>&#10146;</p>
                 </div>
-                <p className="control-data">{this.state.speed > 0 ? 'Forward' : 'Reverse'}</p>
+                <p className="control-data">{this.state.direction > 0 ? 'Forward' : 'Reverse'}</p>
               </div>
             </div>
 

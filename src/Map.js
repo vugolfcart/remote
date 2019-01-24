@@ -7,6 +7,7 @@ export default class Map extends Component {
         <img
           className="stream-image"
           src="http://placehold.jp/1000x1000.png?text=Map%20View"
+          alt="Map"
         />
       </div>
     );
