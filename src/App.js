@@ -7,13 +7,13 @@ import Map from './Map';
 
 
 //==================================================================================================
-// CONTROLS (as of 1/24/19)
+// CONTROLS (as of 1/28/19)
 //==================================================================================================
 // upArrow / w: press gas which increases speed (this will likely be changed later)
 // downArrow / s: press break which decreases speed (likely to be changed later)
-// leftArrow / a: decrease speed
-// rightArrow / d: increase speed
-// e: change direction (forward / reverse)
+// leftArrow / a: NOTHING XXX-decrease speed-XXX
+// rightArrow / d: NOTHING XXX-increase speed-XXX
+// e: change direction (forward / reverse) only when speed is 0
 // q: set speed to 0
 // p: toggle power steering (whether the wheel rotates back to normal)
 // click & drag wheel: turns wheel
@@ -78,14 +78,15 @@ class App extends Component {
         break;
       case 'ArrowLeft':
       case 'a':
-        this.setState({ speed: this.state.speed - 1 });
+        //this.setState({ speed: this.state.speed - 1 });
         break;
       case 'ArrowRight':
       case 'd':
-        this.setState({ speed: this.state.speed + 1 });
+        //this.setState({ speed: this.state.speed + 1 });
         break;
       case 'e':
-        this.setState({ speed: -this.state.speed, direction: -this.state.direction });
+         if (this.state.speed === 0)
+            this.setState({ direction: -this.state.direction })
         break;
       case 'q':
         this.setState({ speed: 0 });
