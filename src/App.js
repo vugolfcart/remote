@@ -24,7 +24,7 @@ import Map from './Map';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.ros = new ROSLIB.Ros({ url: 'ws://localhost:9090' });
+    this.ros = new ROSLIB.Ros({ url: 'ws://10.67.248.128:9090' });
     this.ros.on('connection', () => console.log('[ros]: connected to websocket server.'));
     this.ros.on('error', error => console.log(`[ros]: error connecting to websocket server: ${error}`));
     this.ros.on('close', () => console.log('Connection to websocket server closed.'));
