@@ -6,10 +6,12 @@ export default class VideoStream extends Component {
       <div id="camera-stream-container" className="stream-container">
         <img
           className="stream-image"
-          src="http://placehold.jp/1000x1000.png?text=Camera%20View"
+          src="http://localhost:8080/stream?topic=zed/rgb/image_rect_color"
           alt="Camera View"
         />
       </div>
     );
   }
 }
+
+// Topic: zed/rgb/image_rect_color
