@@ -1,37 +1,21 @@
-import React, { Component } from 'react';
-import steeringWheel from './assets/steering-wheel.png';
-import ROSLIB from 'roslib';
 import './App.css';
-import VideoStream from './VideoStream';
 import Map from './Map';
-
-
-//==================================================================================================
-// CONTROLS (as of 1/28/19)
-//==================================================================================================
-// upArrow / w: press gas which increases speed (this will likely be changed later)
-// downArrow / s: press break which decreases speed (likely to be changed later)
-// leftArrow / a: NOTHING XXX-decrease speed-XXX
-// rightArrow / d: NOTHING XXX-increase speed-XXX
-// e: change direction (forward / reverse) only when speed is 0
-// q: set speed to 0
-// p: toggle power steering (whether the wheel rotates back to normal)
-// click & drag wheel: turns wheel
-// double click wheel: turns wheel but don't have to hold the mouse down to drag
-//==================================================================================================
-//==================================================================================================
+import React, { Component } from 'react';
+import ROSLIB from 'roslib';
+import steeringWheel from './assets/steering-wheel.png';
+import VideoStream from './VideoStream';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.ros = new ROSLIB.Ros({ url: 'ws://10.67.248.128:9090' });
     this.ros.on('connection', () => console.log('[ros]: connected to websocket server.'));
-    this.ros.on('error', error => console.log(`[ros]: error connecting to websocket server: ${error}`));
+    this.ros.on('error', error => console.error(`[ros]: error connecting to websocket server: ${error}`));
     this.ros.on('close', () => console.log('Connection to websocket server closed.'));
     this.controlDriveParameters = new ROSLIB.Topic({
       ros: this.ros,
-      name: '/control_drive_parameters',
-      messageType: 'control/drive_param'
+      name: '/vugc1_control_drive_parameters',
+      messageType: 'vugc1_control/drive_param'
     });
 
     this.maxSpeed = 100;
@@ -75,14 +59,6 @@ class App extends Component {
       case 'ArrowDown':
       case 's':
         this.brake();
-        break;
-      case 'ArrowLeft':
-      case 'a':
-        //this.setState({ speed: this.state.speed - 1 });
-        break;
-      case 'ArrowRight':
-      case 'd':
-        //this.setState({ speed: this.state.speed + 1 });
         break;
       case 'e':
          if (this.state.speed === 0)
@@ -262,8 +238,10 @@ class App extends Component {
   }
 
   render() {
+    const angleDegrees = Math.round(180 / Math.PI * this.state.totalRotation);
+    const angleClamped = Math.min(Math.max(-100, angleDegrees), 100)
     const driveParameters = new ROSLIB.Message({
-      angle: Math.round(180 / Math.PI * this.state.totalRotation),
+      angle: angleClamped,
       velocity: this.state.speed,
     });
     this.controlDriveParameters.publish(driveParameters);
